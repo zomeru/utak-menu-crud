@@ -4,6 +4,7 @@ import { CiImageOn, CiEdit } from 'react-icons/ci';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
 import Modal from 'react-modal';
 import { ref, set, push } from 'firebase/database';
+import { toast } from 'react-toastify';
 
 import { realtimeDB } from '@/configs/firebase';
 import { capitalizeFirstLetterOfWords, formatFloat, formatOnlyNumbers } from '@/utils';
@@ -14,6 +15,7 @@ import useUploadImage from '@/hooks/useImageUpload';
 import { customModalStyles } from '@/constants';
 import ItemOptionsModal, { Options } from './ItemOptionsModal';
 import { Menu } from '@/hooks/useMenu';
+import { createCategory } from '@/services';
 
 Modal.setAppElement('#root');
 
@@ -57,22 +59,11 @@ export const AddItem = () => {
     clearImage();
   }
 
-  const createCategory = () => {
-    const categoriesRef = ref(realtimeDB, 'categories');
-    const newCategoryDocRef = push(categoriesRef);
-
-    const formattedCategory = capitalizeFirstLetterOfWords(category);
-    set(newCategoryDocRef, {
-      name: formattedCategory,
-    });
-    return newCategoryDocRef;
-  };
-
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!name || !category || !price || !stock || !cost) {
-      alert('All fields are required');
+      toast.info('Please fill all required fields');
       return;
     }
 
@@ -100,7 +91,7 @@ export const AddItem = () => {
         if (foundCategory) {
           categoryId = foundCategory.id;
         } else {
-          categoryId = createCategory().key;
+          categoryId = createCategory(category).key;
         }
       } else {
         // Double check if the category exists
@@ -108,7 +99,7 @@ export const AddItem = () => {
         if (categoryExists) {
           categoryId = category;
         } else {
-          categoryId = createCategory().key;
+          categoryId = createCategory(category).key;
         }
       }
 
@@ -133,12 +124,15 @@ export const AddItem = () => {
       }
 
       // Add the menu
-      set(newMenuDocRef, newMenuDoc).then(() => {
-        resetModal();
-      });
+      set(newMenuDocRef, newMenuDoc)
+        .then(() => {
+          resetModal();
+        })
+        .then(() => {
+          toast.success('Item added successfully');
+        });
     } catch (error) {
-      alert('An error occurred');
-      console.error(error);
+      toast.error('An error occurred');
     } finally {
       setIsSubmitting(false);
     }
@@ -277,16 +271,14 @@ export const AddItem = () => {
               }}
             />
             <button
-              // className = small font, that has underline hover
               type='button'
               disabled={isSubmitting}
               onClick={() => {
                 setOptionModalIsOpen(true);
-                // setIsOpen(false);
               }}
               className='text-sm hover:underline transition-all duration-200 ease-in-out mr-auto'
             >
-              Add options
+              {allOptions.length > 0 ? 'Edit options' : 'Add options'}
             </button>
             <ItemOptionsModal
               setOptions={setAllOptions}

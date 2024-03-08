@@ -1,25 +1,31 @@
 import { CiImageOn } from 'react-icons/ci';
 import { Menu } from '@/hooks/useMenu';
 import { useCategories } from '@/hooks';
+import { useMenuContext } from '@/contexts/MenuContext';
 
 interface ItemCardProps extends Menu {
   isSelected: boolean;
-  onSelect: (id: string) => void;
 }
 
-const ItemCard = ({ id, category, cost, name, price, stock, image, options, isSelected, onSelect }: ItemCardProps) => {
+const ItemCard = ({ id, category, cost, name, price, stock, image, options, isSelected }: ItemCardProps) => {
   const categories = useCategories();
+  const { setSelectedMenuId } = useMenuContext();
 
   return (
     <button
       className={`p-2 rounded-lg w-48 text-left bg-white hover:bg-neutral-200 duration-200 transition-all ${isSelected ? 'border-neutral-700 border-2' : 'border-neutral-300 border'}`}
       onClick={() => {
-        onSelect(id);
+        setSelectedMenuId(id);
       }}
     >
-      <div className='h-32 w-full rounded-lg mb-2 flex justify-center items-center'>
+      <div className='h-32 w-full rounded-lg mb-2 flex justify-center items-center bg-neutral-200'>
         {image ? (
-          <img src={image?.url} alt={image?.ref} className='h-full w-full object-cover object-center' loading='lazy' />
+          <img
+            src={image?.url}
+            alt={image?.ref}
+            className='h-full w-full object-cover object-center rounded-lg'
+            loading='lazy'
+          />
         ) : (
           <CiImageOn className='text-neutral-400 w-16 h-16' />
         )}

@@ -3,6 +3,7 @@ import { ref, getDownloadURL, uploadBytes } from 'firebase/storage';
 
 import { storage } from '@/configs/firebase';
 import { keyGen } from '@/utils';
+import { toast } from 'react-toastify';
 
 const useUploadImage = () => {
   const [uploadError, setUploadError] = useState<string>(null as unknown as string);
@@ -28,7 +29,7 @@ const useUploadImage = () => {
 
       return null;
     } catch (error: any) {
-      console.log('error uploading image', error);
+      toast.error('Error uploading image');
       setUploadError(error.message);
       return null;
     }

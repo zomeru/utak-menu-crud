@@ -3,7 +3,9 @@ import { IoIosAddCircleOutline } from 'react-icons/io';
 import { CiCircleRemove } from 'react-icons/ci';
 
 import { optionsModalSyles } from '@/constants';
-import TextInput from './inputs/TextInput';
+import OptionTextInput from './inputs/OptionTextInput';
+import { toast } from 'react-toastify';
+import { Tooltip } from 'react-tooltip';
 
 export type Options = {
   index: number;
@@ -20,6 +22,8 @@ interface ItemOptionsModalProps extends Props {
   options: Options[];
   setOptions: React.Dispatch<React.SetStateAction<Options[]>>;
 }
+
+Modal.setAppElement('#root');
 
 const ItemOptionsModal = ({
   isOpen,
@@ -76,6 +80,11 @@ const ItemOptionsModal = ({
   const removeOptionOfOptions = (mainOptionId: number, optionId: number) => {
     const newNumOfOptionsOfOption = allOptions.map((item) => {
       if (item.index === mainOptionId) {
+        if (item.options.length === 1) {
+          toast.error('You must have at least one option');
+          return item;
+        }
+
         return {
           index: item.index,
           name: item.name,
@@ -143,10 +152,11 @@ const ItemOptionsModal = ({
         <div className='space-y-1'>
           {allOptions.map((item) => (
             <div key={item.index} className='flex space-x-3 items-end'>
-              <TextInput
+              <OptionTextInput
+                placeholder='Size, Color, etc.'
                 required
                 name='Name'
-                className='lg:w-44'
+                className='w-32 md:w-32 lg:w-32'
                 value={item.name}
                 onChange={(e) => onOptionNameChange(e, item.index)}
               />
@@ -154,26 +164,45 @@ const ItemOptionsModal = ({
               <div className='flex space-x-2 items-center'>
                 {item.options.map((optionItem, index) => (
                   <div key={optionItem.index} className='flex items-end'>
-                    <TextInput
+                    <OptionTextInput
+                      placeholder='Option name'
                       required
                       name={`Option ${index + 1}`}
-                      className='lg:w-40'
+                      className='w-32 md:w-32 lg:w-32'
                       value={optionItem.name}
                       onChange={(e) => {
                         onOptionOptionNameChange(e, item.index, optionItem.index);
                       }}
                     />
-                    <button type='button' onClick={() => removeOptionOfOptions(item.index, optionItem.index)}>
+                    <button
+                      type='button'
+                      onClick={() => removeOptionOfOptions(item.index, optionItem.index)}
+                      data-tooltip-id={`remove-option-name-tooltip-${optionItem.index}`}
+                      data-tooltip-content={`Remove ${optionItem.name ? 'option' : 'Option'} ${index + 1}`}
+                    >
                       <CiCircleRemove className='w-4 h-4 text-red-500' />
+                      <Tooltip id={`remove-option-name-tooltip-${optionItem.index}`} />
                     </button>
                   </div>
                 ))}
                 <div className='w-[1px] h-[40px] bg-neutral-300 mt-auto' />
-                <button type='button' onClick={() => addOptionsOfOption(item.index)}>
+                <button
+                  type='button'
+                  onClick={() => addOptionsOfOption(item.index)}
+                  data-tooltip-id={`add-option-name-tooltip-${item.index}`}
+                  data-tooltip-content={`Add another option for '${item.name}'`}
+                >
                   <IoIosAddCircleOutline className='w-6 h-6' />
+                  <Tooltip id={`add-option-name-tooltip-${item.index}`} />
                 </button>
-                <button type='button' onClick={() => removeOption(item.index)}>
+                <button
+                  data-tooltip-id={`remove-option-name-tooltip-${item.index}`}
+                  data-tooltip-content={`Remove ${item.name ? item.name : 'option row'}`}
+                  type='button'
+                  onClick={() => removeOption(item.index)}
+                >
                   <CiCircleRemove className='w-6 h-6 text-red-500' />
+                  <Tooltip id={`remove-option-name-tooltip-${item.index}`} />
                 </button>
               </div>
             </div>

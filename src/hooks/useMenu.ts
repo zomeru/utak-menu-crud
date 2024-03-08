@@ -1,4 +1,4 @@
-import { limitToFirst, query, ref, onValue, orderByChild } from 'firebase/database';
+import { limitToFirst, query, ref, onValue } from 'firebase/database';
 import { useEffect, useState } from 'react';
 import Fuse from 'fuse.js';
 import { useSearchParams } from 'react-router-dom';
@@ -18,7 +18,7 @@ export type Menu = {
   image?: {
     url: string;
     ref: string;
-  };
+  } | null;
   options?: Options[];
 };
 
@@ -32,8 +32,6 @@ const useMenu = () => {
   const [searchParams] = useSearchParams();
   const searchKey = searchParams.get('search');
   const categoryKey = searchParams.get('category');
-
-  console.log('categoryKey', categoryKey);
 
   useEffect(() => {
     const fetchMenu = async () => {

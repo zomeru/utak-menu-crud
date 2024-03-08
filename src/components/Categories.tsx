@@ -27,7 +27,7 @@ const Categories = () => {
   };
 
   return (
-    <div className='flex justify-between items-center px-3'>
+    <div className='flex justify-between items-center'>
       <ul className='flex space-x-1 w-[calc(100%-60px)] overflow-x-hidden hover:overflow-x-auto py-5'>
         {newCategories.map((category, index) => {
           const isSelected =
@@ -47,10 +47,6 @@ const Categories = () => {
           );
         })}
       </ul>
-      <div className='flex space-x-3'>
-        <div className='w-[1px] h-[30px] bg-neutral-300' />
-        <button>Sort</button>
-      </div>
     </div>
   );
 };
