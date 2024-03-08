@@ -35,12 +35,12 @@ const ItemCard = ({ id, category, cost, name, price, stock, image, options, isSe
           <h3 className='font-semibold text-sm'>{name}</h3>
           <p className='text-neutral-500 text-xs'>Category: {categories.find((c) => c.id === category)?.name}</p>
           <p className='font-semibold text-sm'>
-            <span className='text-neutral-500 font-normal'>Price:</span> ${price}
+            <span className='text-neutral-500 font-normal'>Price:</span> ₱{price}
           </p>
         </div>
         <div className='flex items-center justify-between w-full mt-3'>
           <p className='font-semibold text-sm'>
-            <span className='text-neutral-500 font-normal'>Cost: </span>${cost}
+            <span className='text-neutral-500 font-normal'>Cost: </span>₱{cost}
           </p>
           <p className='font-semibold text-sm'>
             <span className='text-neutral-500 font-normal'>Stock:</span> {stock}

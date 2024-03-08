@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { GoPlus } from 'react-icons/go';
 import { CiImageOn, CiEdit } from 'react-icons/ci';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
@@ -16,6 +16,7 @@ import { customModalStyles } from '@/constants';
 import ItemOptionsModal, { Options } from './ItemOptionsModal';
 import { Menu } from '@/hooks/useMenu';
 import { createCategory } from '@/services';
+import { Tooltip } from 'react-tooltip';
 
 Modal.setAppElement('#root');
 
@@ -56,6 +57,7 @@ export const AddItem = () => {
     setCost(0);
     setStock(0);
     setIsCustomCategory(false);
+    setAllOptions([]);
     clearImage();
   }
 
@@ -221,6 +223,8 @@ export const AddItem = () => {
                 />
               )}
               <button
+                data-tooltip-id='custom-category-tooltip'
+                data-tooltip-content={isCustomCategory ? 'Remove custom category' : 'Add custom category'}
                 type='button'
                 disabled={isSubmitting}
                 onClick={() => {
@@ -233,6 +237,7 @@ export const AddItem = () => {
                 ) : (
                   <CiEdit className='w-5 h-5' />
                 )}
+                <Tooltip id='custom-category-tooltip' />
               </button>
             </div>
             <TextInput
