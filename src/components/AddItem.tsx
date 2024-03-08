@@ -1,30 +1,59 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { GoPlus } from 'react-icons/go';
+import { CiImageOn, CiEdit } from 'react-icons/ci';
+import { IoIosCloseCircleOutline } from 'react-icons/io';
 import Modal from 'react-modal';
-import { get, ref, set, push, orderByChild, equalTo, query } from 'firebase/database';
+import { ref, set, push } from 'firebase/database';
 
 import { realtimeDB } from '@/configs/firebase';
-import { capitalizeFirstLetterOfWords } from '@/utils';
-
-const customStyles = {
-  content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-  },
-};
+import { capitalizeFirstLetterOfWords, formatFloat, formatOnlyNumbers } from '@/utils';
+import SelectCategories from './inputs/SelectCategories';
+import TextInput from './inputs/TextInput';
+import { useCategories, useFileHandler } from '@/hooks';
+import useUploadImage from '@/hooks/useImageUpload';
+import { customModalStyles } from '@/constants';
+import ItemOptionsModal from './ItemOptionsModal';
 
 Modal.setAppElement('#root');
 
+type Options = {
+  name: string;
+  options: string[];
+}[];
+
+type Menu = {
+  name: string;
+  category: string;
+  price: number;
+  cost: number;
+  stock: number;
+  image?: {
+    url: string;
+    ref: string;
+  };
+  options?: Options;
+};
+
 export const AddItem = () => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [handleMenuImage, menuFile, menuImage, clearImage] = useFileHandler();
+  const { uploadImage } = useUploadImage();
+
+  const categories = useCategories();
+
   const [modalIsOpen, setIsOpen] = useState(false);
+  const [optionModalIsOpen, setOptionModalIsOpen] = useState(false);
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Form
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [price, setPrice] = useState(0);
+  const [cost, setCost] = useState(0);
   const [stock, setStock] = useState(0);
+  const [options, setOptions] = useState<Options>([]);
 
   function openModal() {
     setIsOpen(true);
@@ -39,57 +68,93 @@ export const AddItem = () => {
     setName('');
     setCategory('');
     setPrice(0);
+    setCost(0);
     setStock(0);
+    setIsCustomCategory(false);
+    clearImage();
   }
+
+  const createCategory = () => {
+    const categoriesRef = ref(realtimeDB, 'categories');
+    const newCategoryDocRef = push(categoriesRef);
+
+    const formattedCategory = capitalizeFirstLetterOfWords(category);
+    set(newCategoryDocRef, {
+      name: formattedCategory,
+    });
+    return newCategoryDocRef;
+  };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!name || !category || !price || !stock) {
+    if (!name || !category || !price || !stock || !cost) {
       alert('All fields are required');
       return;
     }
 
-    const formattedCategory = capitalizeFirstLetterOfWords(category);
+    setIsSubmitting(true);
 
     try {
+      let imageCover;
+
+      if (menuFile || menuImage) {
+        imageCover = await uploadImage('menu', menuFile);
+      }
+
       // menu ref
       const newMenuDocRef = push(ref(realtimeDB, 'menu'));
 
-      // category ref -> Check if the `formattedCategory` already exists
-      const categoriesRef = ref(realtimeDB, 'categories');
-      const categoryQuery = query(categoriesRef, orderByChild('name'), equalTo(formattedCategory));
-      const snapshot = await get(categoryQuery);
+      let categoryId: string | null = '';
 
-      // If it exists, get the categoryId and add the menu
-      if (snapshot.val()) {
-        const categoryId = Object.keys(snapshot.val())[0];
-        set(newMenuDocRef, {
-          name,
-          category: categoryId,
-          price,
-          stock,
-        }).then(() => {
-          resetModal();
-        });
-        return;
+      if (isCustomCategory) {
+        // If it's a custom category, create a new category
+
+        // But first, check if the custom category already exists
+        const formattedCategory = capitalizeFirstLetterOfWords(category);
+        const foundCategory = categories.find((cat) => cat.name === formattedCategory);
+
+        if (foundCategory) {
+          categoryId = foundCategory.id;
+        } else {
+          categoryId = createCategory().key;
+        }
+      } else {
+        // Double check if the category exists
+        const categoryExists = categories.find((cat) => cat.id === category);
+        if (categoryExists) {
+          categoryId = category;
+        } else {
+          categoryId = createCategory().key;
+        }
       }
 
-      // If it doesn't exist, create a new category and add the menu
-      const newCategoryDocRef = push(categoriesRef);
-      set(newCategoryDocRef, {
-        name: formattedCategory,
-      });
-      const categoryId = newCategoryDocRef.key;
-      set(newMenuDocRef, {
+      if (!categoryId) {
+        throw new Error('An error occurred');
+      }
+
+      const newMenuDoc: Menu = {
         name,
         category: categoryId,
         price,
+        cost,
         stock,
-      }).then(() => {
+      };
+
+      if (imageCover) {
+        newMenuDoc['image'] = imageCover;
+      }
+
+      // Add the menu
+      set(newMenuDocRef, newMenuDoc).then(() => {
         resetModal();
       });
-    } catch (error) {}
+    } catch (error) {
+      alert('An error occurred');
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -101,13 +166,164 @@ export const AddItem = () => {
         <span>Add Item</span>
         <GoPlus className='w-5 h-5' />
       </button>
-      <Modal isOpen={modalIsOpen} onRequestClose={closeModal} style={customStyles} contentLabel='Example Modal'>
-        <form onSubmit={onSubmit}>
-          <input type='text' placeholder='Name' value={name} onChange={(e) => setName(e.target.value)} />
-          <input type='text' placeholder='Category' value={category} onChange={(e) => setCategory(e.target.value)} />
-          <input type='number' placeholder='Price' value={price} onChange={(e) => setPrice(Number(e.target.value))} />
-          <input type='number' placeholder='Stock' value={stock} onChange={(e) => setStock(Number(e.target.value))} />
-          <button type='submit'>Add</button>
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={() => {
+          if (!isSubmitting) resetModal();
+        }}
+        style={customModalStyles}
+        contentLabel='Example Modal'
+      >
+        <form onSubmit={onSubmit} className='flex p-5 space-x-10'>
+          <div className='flex flex-col items-center'>
+            <button
+              type='button'
+              className='flex flex-col justify-center items-center border rounded-xl border-neutral-300 px-5 hover:bg-neutral-100 transition-all duration-200 py-2'
+              onClick={() => {
+                if (fileInputRef.current && !isSubmitting) {
+                  fileInputRef.current.click();
+                }
+              }}
+            >
+              {menuImage ? (
+                <img src={menuImage} alt='menu' className='w-64 h-64 object-cover rounded-lg' />
+              ) : (
+                <>
+                  <CiImageOn className='w-64 h-64 mx-auto text-neutral-300' />
+                  <span className='text-neutral-400'>Add Photo (Optional)</span>
+                </>
+              )}
+            </button>
+            {menuImage && (
+              <button
+                type='button'
+                className='mt-3 text-sm hover:underline transition-all duration-200 ease-in-out'
+                onClick={() => {
+                  if (!isSubmitting) clearImage();
+                }}
+              >
+                <span className='text-red-500'>Remove Photo</span>
+              </button>
+            )}
+            <input
+              disabled={isSubmitting}
+              type='file'
+              accept='image/jpeg, image/png, image/jpg, image/webp'
+              onChange={handleMenuImage}
+              ref={fileInputRef}
+              hidden
+            />
+          </div>
+          <div className='flex flex-col space-y-3'>
+            <TextInput
+              name='Name'
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              disabled={isSubmitting}
+            />
+            <div className='flex space-x-3 items-end'>
+              {isCustomCategory ? (
+                <TextInput
+                  name='Category'
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                />
+              ) : (
+                <SelectCategories
+                  required
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  disabled={isSubmitting}
+                />
+              )}
+              <button
+                type='button'
+                disabled={isSubmitting}
+                onClick={() => {
+                  setIsCustomCategory((prev) => !prev);
+                  setCategory('');
+                }}
+              >
+                {isCustomCategory ? (
+                  <IoIosCloseCircleOutline className='w-5 h-5 text-red-500' />
+                ) : (
+                  <CiEdit className='w-5 h-5' />
+                )}
+              </button>
+            </div>
+            <TextInput
+              disabled={isSubmitting}
+              required
+              name='Price'
+              value={price}
+              type='number'
+              step={0.01}
+              onChange={(e) => {
+                const value = formatFloat(e.target.value);
+                setPrice(value);
+              }}
+            />
+            <TextInput
+              disabled={isSubmitting}
+              required
+              name='Cost'
+              type='number'
+              step={0.01}
+              value={cost}
+              onChange={(e) => {
+                const value = formatFloat(e.target.value);
+                setCost(value);
+              }}
+            />
+            <TextInput
+              disabled={isSubmitting}
+              required
+              name='Stock'
+              type='text'
+              value={stock}
+              onChange={(e) => {
+                const value = formatOnlyNumbers(e.target.value);
+                setStock(value);
+              }}
+            />
+            <button
+              // className = small font, that has underline hover
+              type='button'
+              disabled={isSubmitting}
+              onClick={() => {
+                setOptionModalIsOpen(true);
+                // setIsOpen(false);
+              }}
+              className='text-sm hover:underline transition-all duration-200 ease-in-out mr-auto'
+            >
+              Add options
+            </button>
+            <ItemOptionsModal
+              isOpen={optionModalIsOpen}
+              onRequestClose={() => {
+                if (!isSubmitting) {
+                  setOptionModalIsOpen(false);
+                }
+              }}
+            />
+            <button
+              disabled={isSubmitting}
+              type='submit'
+              className='w-min ml-auto flex items-center rounded-full border border-neutral-700 px-5 space-x-3 hover:bg-neutral-100 transition-all duration-200 py-2 mr-8'
+            >
+              {isSubmitting ? (
+                <span className='whitespace-nowrap'>Adding...</span>
+              ) : (
+                <>
+                  <span className='whitespace-nowrap'>Add Item</span>
+                  <GoPlus className='w-5 h-5' />
+                </>
+              )}
+            </button>
+          </div>
         </form>
       </Modal>
     </>

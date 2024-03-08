@@ -27,7 +27,7 @@ const Navbar = () => {
           })}
         </ul>
       </nav>
-      <div>Admin</div>
+      <div>Merchant</div>
     </header>
   );
 };

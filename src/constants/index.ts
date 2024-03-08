@@ -24,3 +24,23 @@ export const NAVBAR_ITEMS = [
     href: '#',
   },
 ];
+
+export const customModalStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+    borderRadius: '1rem',
+    zIndex: 1000,
+  },
+};
+
+export const optionsModalSyles = {
+  content: {
+    ...customModalStyles.content,
+    zIndex: 1000,
+  },
+};

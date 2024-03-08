@@ -14,3 +14,8 @@ html {
   scroll-behavior: smooth;
   box-sizing: inherit;
 }
+
+body {
+  /* tailwind bg-neutral-200 */
+  background-color: #f3f4f6;
+}
