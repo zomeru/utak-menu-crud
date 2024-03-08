@@ -1,4 +1,4 @@
-import { get, ref, orderByChild, query } from 'firebase/database';
+import { ref, orderByChild, query, onValue } from 'firebase/database';
 
 import { realtimeDB } from '@/configs/firebase';
 import { useEffect, useState } from 'react';
@@ -13,7 +13,8 @@ const useCategories = () => {
   useEffect(() => {
     const categoriesRef = ref(realtimeDB, 'categories');
     const orderQuery = query(categoriesRef, orderByChild('name'));
-    get(orderQuery).then((snapshot) => {
+
+    onValue(orderQuery, (snapshot) => {
       if (snapshot.exists()) {
         const _categories = (Object.entries(snapshot.val()) as [string, Category][]).map(
           ([id, category]: [string, Category]) => ({

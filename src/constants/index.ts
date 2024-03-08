@@ -44,3 +44,5 @@ export const optionsModalSyles = {
     zIndex: 1000,
   },
 };
+
+export const MENU_QUERY_LIMIT = 20;

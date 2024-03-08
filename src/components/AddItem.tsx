@@ -13,21 +13,9 @@ import { useCategories, useFileHandler } from '@/hooks';
 import useUploadImage from '@/hooks/useImageUpload';
 import { customModalStyles } from '@/constants';
 import ItemOptionsModal, { Options } from './ItemOptionsModal';
+import { Menu } from '@/hooks/useMenu';
 
 Modal.setAppElement('#root');
-
-type Menu = {
-  name: string;
-  category: string;
-  price: number;
-  cost: number;
-  stock: number;
-  image?: {
-    url: string;
-    ref: string;
-  };
-  options?: Options[];
-};
 
 export const AddItem = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -128,7 +116,7 @@ export const AddItem = () => {
         throw new Error('An error occurred');
       }
 
-      const newMenuDoc: Menu = {
+      const newMenuDoc: Omit<Menu, 'id'> = {
         name,
         category: categoryId,
         price,
