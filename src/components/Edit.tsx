@@ -336,25 +336,27 @@ const Edit = () => {
         )}
       </div>
 
-      <div className='space-y-2'>
-        <button
-          type='submit'
-          className={`w-full mt-auto py-2 rounded-lg  text-white font-semibold transition-all duration-200 ${
-            hasInputChanged ? 'bg-blue-600 hover:bg-blue-700' : 'bg-neutral-700 cursor-not-allowed'
-          }`}
-          disabled={!hasInputChanged || isSubmitting}
-        >
-          {isSubmitting ? 'Updating...' : 'Update Item'}
-        </button>
-        <button
-          type='button'
-          className={`w-full mt-auto py-2 rounded-lg  text-white font-semibold transition-all duration-200 bg-red-600 hover:bg-red-700 disabled:bg-neutral-700 disabled:cursor-not-allowed`}
-          disabled={isSubmitting}
-          onClick={removeItem}
-        >
-          {isSubmitting ? 'Removing...' : 'Remove Item'}
-        </button>
-      </div>
+      {selectedMenuId && (
+        <div className='space-y-2'>
+          <button
+            type='submit'
+            className={`w-full mt-auto py-2 rounded-lg  text-white font-semibold transition-all duration-200 ${
+              hasInputChanged ? 'bg-blue-600 hover:bg-blue-700' : 'bg-neutral-700 cursor-not-allowed'
+            }`}
+            disabled={!hasInputChanged || isSubmitting}
+          >
+            {isSubmitting ? 'Updating...' : 'Update Item'}
+          </button>
+          <button
+            type='button'
+            className={`w-full mt-auto py-2 rounded-lg  text-white font-semibold transition-all duration-200 bg-red-600 hover:bg-red-700 disabled:bg-neutral-700 disabled:cursor-not-allowed`}
+            disabled={isSubmitting}
+            onClick={removeItem}
+          >
+            {isSubmitting ? 'Removing...' : 'Remove Item'}
+          </button>
+        </div>
+      )}
     </form>
   );
 };
