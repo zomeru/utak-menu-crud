@@ -12,14 +12,9 @@ import TextInput from './inputs/TextInput';
 import { useCategories, useFileHandler } from '@/hooks';
 import useUploadImage from '@/hooks/useImageUpload';
 import { customModalStyles } from '@/constants';
-import ItemOptionsModal from './ItemOptionsModal';
+import ItemOptionsModal, { Options } from './ItemOptionsModal';
 
 Modal.setAppElement('#root');
-
-type Options = {
-  name: string;
-  options: string[];
-}[];
 
 type Menu = {
   name: string;
@@ -31,7 +26,7 @@ type Menu = {
     url: string;
     ref: string;
   };
-  options?: Options;
+  options?: Options[];
 };
 
 export const AddItem = () => {
@@ -53,7 +48,7 @@ export const AddItem = () => {
   const [price, setPrice] = useState(0);
   const [cost, setCost] = useState(0);
   const [stock, setStock] = useState(0);
-  const [options, setOptions] = useState<Options>([]);
+  const [allOptions, setAllOptions] = useState<Options[]>([]);
 
   function openModal() {
     setIsOpen(true);
@@ -143,6 +138,10 @@ export const AddItem = () => {
 
       if (imageCover) {
         newMenuDoc['image'] = imageCover;
+      }
+
+      if (allOptions.length > 0) {
+        newMenuDoc['options'] = allOptions;
       }
 
       // Add the menu
@@ -302,7 +301,10 @@ export const AddItem = () => {
               Add options
             </button>
             <ItemOptionsModal
+              setOptions={setAllOptions}
+              options={allOptions}
               isOpen={optionModalIsOpen}
+              closeModal={() => setOptionModalIsOpen(false)}
               onRequestClose={() => {
                 if (!isSubmitting) {
                   setOptionModalIsOpen(false);
