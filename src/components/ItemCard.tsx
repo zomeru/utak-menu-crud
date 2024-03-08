@@ -7,7 +7,7 @@ interface ItemCardProps extends Menu {
   isSelected: boolean;
 }
 
-const ItemCard = ({ id, category, cost, name, price, stock, image, options, isSelected }: ItemCardProps) => {
+const ItemCard = ({ id, category, cost, name, price, stock, image, isSelected }: ItemCardProps) => {
   const categories = useCategories();
   const { setSelectedMenuId } = useMenuContext();
 

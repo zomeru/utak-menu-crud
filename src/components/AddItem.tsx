@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { GoPlus } from 'react-icons/go';
 import { CiImageOn, CiEdit } from 'react-icons/ci';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
