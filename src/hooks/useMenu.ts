@@ -7,7 +7,6 @@ import { Options } from '@/components/ItemOptionsModal';
 import { realtimeDB } from '@/configs/firebase';
 import { MENU_QUERY_LIMIT } from '@/constants';
 import useCategories from './useCategories';
-import { useMenuContext } from '@/contexts/MenuContext';
 
 export type Menu = {
   id: string;
