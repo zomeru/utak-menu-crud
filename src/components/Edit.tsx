@@ -38,6 +38,7 @@ const Edit = () => {
 
   const [isCustomCategory, setIsCustomCategory] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
   const [optionModalIsOpen, setOptionModalIsOpen] = useState(false);
 
   // Form
@@ -161,7 +162,7 @@ const Edit = () => {
 
   const removeItem = async () => {
     // Remove the menu
-    setIsSubmitting(true);
+    setIsRemoving(true);
     const menuRef = ref(realtimeDB, 'menu');
     remove(child(menuRef, selectedMenuId))
       .then(() => {
@@ -171,7 +172,7 @@ const Edit = () => {
         toast.error('An error occurred');
       })
       .finally(() => {
-        setIsSubmitting(false);
+        setIsRemoving(false);
       });
   };
 
@@ -353,10 +354,10 @@ const Edit = () => {
           <button
             type='button'
             className={`w-full mt-auto py-2 rounded-lg  text-white font-semibold transition-all duration-200 bg-red-600 hover:bg-red-700 disabled:bg-neutral-700 disabled:cursor-not-allowed`}
-            disabled={isSubmitting}
+            disabled={isRemoving || isSubmitting}
             onClick={removeItem}
           >
-            {isSubmitting ? 'Removing...' : 'Remove Item'}
+            {isRemoving ? 'Removing...' : 'Remove Item'}
           </button>
         </div>
       )}
