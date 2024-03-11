@@ -94,6 +94,7 @@ const Edit = () => {
     if (!hasInputChanged || !selectedMenuId) return;
 
     try {
+      setIsSubmitting(true);
       let imageCover;
 
       if (menuFile || menuImage) {
@@ -177,8 +178,8 @@ const Edit = () => {
   return (
     <form className='w-[25%] bg-white rounded-xl p-5 h-full flex flex-col justify-between' onSubmit={handleSubmit}>
       <h2 className='font-semibold text-3xl'>Edit</h2>
-      <div className='flex flex-col space-y-3 mt-5 justify-between'>
-        {selectedMenu ? (
+      {selectedMenu ? (
+        <div className='flex flex-col space-y-3 mt-5 justify-between'>
           <div className='flex flex-col space-y-3'>
             {/* img */}
             <div className='h-40 w-60 rounded-lg mb-2 flex justify-center items-center mx-auto flex-col'>
@@ -331,10 +332,12 @@ const Edit = () => {
               }}
             />
           </div>
-        ) : (
+        </div>
+      ) : (
+        <div className='h-full w-full flex justify-center items-center'>
           <p className='text-neutral-500 text-lg'>No item selected</p>
-        )}
-      </div>
+        </div>
+      )}
 
       {selectedMenuId && (
         <div className='space-y-2'>

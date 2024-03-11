@@ -30,6 +30,10 @@ const MenuProvider: FC<MenuProviderProps> = ({ children }) => {
     if (menu.length > 0 && !shouldChange) {
       setSelectedMenuId(menu[0].id);
     }
+
+    if (menu.length === 0) {
+      setSelectedMenuId('');
+    }
   }, [menu, selectedMenuId]);
 
   const value = useMemo(
