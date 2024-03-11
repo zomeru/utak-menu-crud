@@ -158,6 +158,13 @@ const Edit = () => {
               await removeImage(selectedMenu?.image?.url);
             }
           }
+
+          // Find menu with the selected category, if found none, remove the category
+          if (selectedMenu?.category) {
+            removeCategoryIfNoMenu(selectedMenu.category);
+          }
+
+          setIsCustomCategory(false);
         });
     } catch (error) {
       toast.error('An error occurred');
