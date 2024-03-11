@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { CiImageOn, CiEdit } from 'react-icons/ci';
-import { ref, child, update, remove } from 'firebase/database';
+import { ref, child, update, remove, serverTimestamp } from 'firebase/database';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
 
 import { useMenuContext } from '@/contexts/MenuContext';
@@ -72,10 +72,6 @@ const Edit = () => {
     };
   }, [menu, selectedMenuId]);
 
-  console.log({
-    menuImage: !!menuImage,
-  });
-
   const hasInputChanged = useMemo(() => {
     return (
       name !== selectedMenu?.name ||
@@ -130,12 +126,13 @@ const Edit = () => {
         throw new Error('An error occurred');
       }
 
-      const updatedMenuDoc: Omit<Menu, 'id'> = {
+      const updatedMenuDoc: Omit<Menu, 'id' | 'createdAt'> = {
         name,
         category: categoryId,
         price,
         cost,
         stock,
+        updatedAt: serverTimestamp(),
       };
 
       if (allOptions.length > 0) {

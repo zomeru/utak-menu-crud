@@ -7,6 +7,7 @@ import { Options } from '@/components/ItemOptionsModal';
 import { realtimeDB } from '@/configs/firebase';
 import { MENU_QUERY_LIMIT } from '@/constants';
 import useCategories from './useCategories';
+import { useMenuContext } from '@/contexts/MenuContext';
 
 export type Menu = {
   id: string;
@@ -15,6 +16,8 @@ export type Menu = {
   price: number;
   cost: number;
   stock: number;
+  createdAt: object;
+  updatedAt?: object;
   image?: {
     url: string;
     ref: string;
@@ -25,6 +28,7 @@ export type Menu = {
 const useMenu = () => {
   const categories = useCategories();
 
+  const [selectedMenuId, setSelectedMenuId] = useState<string>('');
   const [menu, setMenu] = useState<Menu[]>([]);
   const [loading, setLoading] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
@@ -61,7 +65,8 @@ const useMenu = () => {
             setMenu(_newMenu);
           }
         } else {
-          console.log('No menu available');
+          setMenu([]);
+          setSelectedMenuId('');
         }
 
         setLoading(false);
@@ -75,7 +80,7 @@ const useMenu = () => {
     setPageNumber((prev) => prev + 1);
   };
 
-  return { menu, loading, loadMore };
+  return { menu, loading, loadMore, selectedMenuId, setSelectedMenuId };
 };
 
 export default useMenu;

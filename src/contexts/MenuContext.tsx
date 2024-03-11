@@ -20,9 +20,10 @@ interface MenuProviderProps {
 }
 
 const MenuProvider: FC<MenuProviderProps> = ({ children }) => {
-  const { menu, loading, loadMore } = useMenu();
+  const { menu, loading, loadMore, selectedMenuId, setSelectedMenuId } = useMenu();
 
-  const [selectedMenuId, setSelectedMenuId] = useState<string>('');
+  console.log('menu', menu);
+  console.log('selectedMenuId', selectedMenuId);
 
   useEffect(() => {
     const shouldChange = menu.find((m) => m.id === selectedMenuId);

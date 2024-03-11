@@ -3,7 +3,7 @@ import { GoPlus } from 'react-icons/go';
 import { CiImageOn, CiEdit } from 'react-icons/ci';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
 import Modal from 'react-modal';
-import { ref, set, push } from 'firebase/database';
+import { ref, set, push, serverTimestamp } from 'firebase/database';
 import { toast } from 'react-toastify';
 
 import { realtimeDB } from '@/configs/firebase';
@@ -115,6 +115,7 @@ export const AddItem = () => {
         price,
         cost,
         stock,
+        createdAt: serverTimestamp(),
       };
 
       if (imageCover) {
