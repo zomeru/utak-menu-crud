@@ -1,17 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { CiImageOn, CiEdit } from 'react-icons/ci';
-import {
-  ref,
-  child,
-  update,
-  remove,
-  serverTimestamp,
-  equalTo,
-  query,
-  get,
-  limitToFirst,
-  orderByChild,
-} from 'firebase/database';
+import { ref, child, update, remove, serverTimestamp } from 'firebase/database';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
 
 import { useMenuContext } from '@/contexts/MenuContext';
@@ -21,7 +10,7 @@ import { capitalizeFirstLetterOfWords, formatFloat, formatOnlyNumbers } from '@/
 import SelectCategories from './inputs/SelectCategories';
 import { Menu } from '@/hooks/useMenu';
 import { useCategories, useFileHandler } from '@/hooks';
-import { createCategory, removeImage } from '@/services';
+import { createCategory, removeCategoryIfNoMenu, removeImage } from '@/services';
 import { realtimeDB } from '@/configs/firebase';
 import { toast } from 'react-toastify';
 import useUploadImage from '@/hooks/useImageUpload';
@@ -185,17 +174,9 @@ const Edit = () => {
       .then(async () => {
         toast.success('Item removed successfully');
 
-        // Find menu with the same category, if it's the last one, remove the category
+        // Find menu with the selected category, if found none, remove the category
         if (selectedMenu?.category) {
-          const q = query(menuRef, equalTo(selectedMenu?.category), limitToFirst(2), orderByChild('category'));
-
-          get(q).then((snapshot) => {
-            // If there's no menu with the same category, remove the category
-            if (!snapshot.exists()) {
-              const categoryRef = ref(realtimeDB, 'categories');
-              remove(child(categoryRef, selectedMenu?.category));
-            }
-          });
+          removeCategoryIfNoMenu(selectedMenu.category);
         }
 
         // Remove the image from storage
