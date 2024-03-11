@@ -1,5 +1,5 @@
 import useMenu, { Menu } from '@/hooks/useMenu';
-import { createContext, FC, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
+import { createContext, FC, useContext, ReactNode, useMemo, useEffect } from 'react';
 
 export interface MenuContextProps {
   menu: Menu[];
@@ -21,9 +21,6 @@ interface MenuProviderProps {
 
 const MenuProvider: FC<MenuProviderProps> = ({ children }) => {
   const { menu, loading, loadMore, selectedMenuId, setSelectedMenuId } = useMenu();
-
-  console.log('menu', menu);
-  console.log('selectedMenuId', selectedMenuId);
 
   useEffect(() => {
     const shouldChange = menu.find((m) => m.id === selectedMenuId);
