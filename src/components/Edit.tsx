@@ -200,7 +200,10 @@ const Edit = () => {
   };
 
   return (
-    <form className='w-[25%] bg-white rounded-xl p-5 h-full flex flex-col justify-between' onSubmit={handleSubmit}>
+    <form
+      className='w-[35%] md:w-[30%] lg:w-[25%] bg-white rounded-xl p-5 h-full flex flex-col justify-between'
+      onSubmit={handleSubmit}
+    >
       <h2 className='font-semibold text-3xl'>Edit</h2>
       {selectedMenu ? (
         <div className='flex flex-col space-y-3 mt-5 justify-between'>

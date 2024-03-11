@@ -9,7 +9,7 @@ const Navbar = () => {
         <h1 className='font-semibold text-lg'>UTAK Menu CRUD</h1>
       </a>
       <nav>
-        <ul className='flex space-x-10 h-full'>
+        <ul className='flex space-x-3 md:space-x-10 h-full'>
           {NAVBAR_ITEMS.map(({ Icon, href, label }, index) => {
             const isMenu = label === 'Menu';
 
@@ -19,7 +19,7 @@ const Navbar = () => {
                   href={href}
                   className={`py-6 h-full flex items-center space-x-3 ${isMenu ? 'text-neutral-700 after:content-[""]  after:absolute after:h-[3px] after:w-full after:bg-neutral-700 after:bottom-0 after:left-0 after:transition-all after:duration-200' : 'text-neutral-500 after:width-0'} hover:text-neutral-700 transition-all duration-200 hover:after:content-[""] hover:after:absolute hover:after:h-[3px] hover:after:w-full hover:after:bg-neutral-700 hover:after:bottom-0 hover:after:left-0 hover:after:transition-all hover:after:duration-200`}
                 >
-                  <Icon className='w-5 h-5' />
+                  <Icon className='w-5 h-5 hidden md:block' />
                   <span>{label}</span>
                 </a>
               </li>
