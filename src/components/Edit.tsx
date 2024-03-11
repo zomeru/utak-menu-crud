@@ -1,6 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { CiImageOn, CiEdit } from 'react-icons/ci';
-import { ref, child, update, remove, serverTimestamp } from 'firebase/database';
+import {
+  ref,
+  child,
+  update,
+  remove,
+  serverTimestamp,
+  equalTo,
+  query,
+  get,
+  limitToFirst,
+  orderByChild,
+} from 'firebase/database';
 import { IoIosCloseCircleOutline } from 'react-icons/io';
 
 import { useMenuContext } from '@/contexts/MenuContext';
@@ -10,7 +21,7 @@ import { capitalizeFirstLetterOfWords, formatFloat, formatOnlyNumbers } from '@/
 import SelectCategories from './inputs/SelectCategories';
 import { Menu } from '@/hooks/useMenu';
 import { useCategories, useFileHandler } from '@/hooks';
-import { createCategory } from '@/services';
+import { createCategory, removeImage } from '@/services';
 import { realtimeDB } from '@/configs/firebase';
 import { toast } from 'react-toastify';
 import useUploadImage from '@/hooks/useImageUpload';
@@ -92,7 +103,7 @@ const Edit = () => {
 
     try {
       setIsSubmitting(true);
-      let imageCover;
+      let imageCover: { url: string; ref: string } | null = null;
 
       if (menuFile || menuImage) {
         imageCover = await uploadImage('menu', menuFile);
@@ -147,9 +158,18 @@ const Edit = () => {
 
       // Update the menu
       const menuRef = ref(realtimeDB, 'menu');
-      update(child(menuRef, selectedMenuId), updatedMenuDoc).then(() => {
-        toast.success('Item updated successfully');
-      });
+      update(child(menuRef, selectedMenuId), updatedMenuDoc)
+        .then(() => {
+          toast.success('Item updated successfully');
+        })
+        .then(async () => {
+          // If there's a new image, remove the old one
+          if (imageCover) {
+            if (selectedMenu?.image?.url) {
+              await removeImage(selectedMenu?.image?.url);
+            }
+          }
+        });
     } catch (error) {
       toast.error('An error occurred');
     } finally {
@@ -162,8 +182,26 @@ const Edit = () => {
     setIsRemoving(true);
     const menuRef = ref(realtimeDB, 'menu');
     remove(child(menuRef, selectedMenuId))
-      .then(() => {
+      .then(async () => {
         toast.success('Item removed successfully');
+
+        // Find menu with the same category, if it's the last one, remove the category
+        if (selectedMenu?.category) {
+          const q = query(menuRef, equalTo(selectedMenu?.category), limitToFirst(2), orderByChild('category'));
+
+          get(q).then((snapshot) => {
+            // If there's no menu with the same category, remove the category
+            if (!snapshot.exists()) {
+              const categoryRef = ref(realtimeDB, 'categories');
+              remove(child(categoryRef, selectedMenu?.category));
+            }
+          });
+        }
+
+        // Remove the image from storage
+        if (selectedMenu?.image?.url) {
+          await removeImage(selectedMenu?.image?.url);
+        }
       })
       .catch(() => {
         toast.error('An error occurred');

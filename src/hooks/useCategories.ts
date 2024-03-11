@@ -24,7 +24,7 @@ const useCategories = () => {
         );
         setCategories(_categories);
       } else {
-        console.log('No categories available');
+        setCategories([]);
       }
     });
   }, []);
