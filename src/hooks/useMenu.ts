@@ -44,10 +44,7 @@ const useMenu = () => {
 
       onValue(q, (snapshot) => {
         if (snapshot.exists()) {
-          const _menu = (Object.entries(snapshot.val()) as [string, Menu][]).map(([id, item]: [string, Menu]) => ({
-            ...item,
-            id,
-          }));
+          const _menu = Object.values(snapshot.val() as Menu[]);
 
           const categoryId = categories.find((c) => c.name === categoryKey)?.id;
 

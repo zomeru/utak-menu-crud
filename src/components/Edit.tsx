@@ -126,7 +126,8 @@ const Edit = () => {
         throw new Error('An error occurred');
       }
 
-      const updatedMenuDoc: Omit<Menu, 'id' | 'createdAt'> = {
+      const updatedMenuDoc: Omit<Menu, 'createdAt'> = {
+        id: selectedMenuId,
         name,
         category: categoryId,
         price,
@@ -155,7 +156,7 @@ const Edit = () => {
           // If there's a new image, remove the old one
           if (imageCover) {
             if (selectedMenu?.image?.url) {
-              await removeImage(selectedMenu?.image?.url);
+              await removeImage(selectedMenu.image.url);
             }
           }
 
@@ -188,7 +189,7 @@ const Edit = () => {
 
         // Remove the image from storage
         if (selectedMenu?.image?.url) {
-          await removeImage(selectedMenu?.image?.url);
+          await removeImage(selectedMenu.image.url);
         }
       })
       .catch(() => {

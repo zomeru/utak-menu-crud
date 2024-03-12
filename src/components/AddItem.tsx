@@ -109,7 +109,12 @@ export const AddItem = () => {
         throw new Error('An error occurred');
       }
 
-      const newMenuDoc: Omit<Menu, 'id'> = {
+      if (!newMenuDocRef.key) {
+        throw new Error('An error occurred');
+      }
+
+      const newMenuDoc: Menu = {
+        id: newMenuDocRef.key,
         name,
         category: categoryId,
         price,

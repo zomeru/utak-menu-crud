@@ -16,12 +16,7 @@ const useCategories = () => {
 
     onValue(orderQuery, (snapshot) => {
       if (snapshot.exists()) {
-        const _categories = (Object.entries(snapshot.val()) as [string, Category][]).map(
-          ([id, category]: [string, Category]) => ({
-            id,
-            name: category.name,
-          }),
-        );
+        const _categories = Object.values(snapshot.val() as Category[]);
         setCategories(_categories);
       } else {
         setCategories([]);

@@ -9,6 +9,7 @@ export const createCategory = (category: string) => {
 
   const formattedCategory = capitalizeFirstLetterOfWords(category);
   set(newCategoryDocRef, {
+    id: newCategoryDocRef.key,
     name: formattedCategory,
   });
   return newCategoryDocRef;
