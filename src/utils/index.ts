@@ -30,13 +30,6 @@ export function formatFloat(value: string) {
   return parseFloat(val);
 }
 
-export function formatCurrency(value: number) {
-  return value.toLocaleString('en-US', {
-    style: 'currency',
-    currency: 'PHP',
-  });
-}
-
 export function generateRandomString(length: number = 10) {
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let result = '';
