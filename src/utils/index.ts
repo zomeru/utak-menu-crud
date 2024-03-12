@@ -20,8 +20,21 @@ export function formatOnlyNumbers(value: string) {
 
 export function formatFloat(value: string) {
   const val = value.replace(/[^0-9.]/g, '');
+  // check if after decimal point there are more than 2 digits
+  const decimal = val.split('.')[1];
+
+  if (decimal && decimal.length > 2) {
+    return parseFloat(val.slice(0, -1));
+  }
 
   return parseFloat(val);
+}
+
+export function formatCurrency(value: number) {
+  return value.toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'PHP',
+  });
 }
 
 export function generateRandomString(length: number = 10) {
