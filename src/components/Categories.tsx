@@ -1,6 +1,7 @@
 import { useCategories } from '@/hooks';
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Tooltip } from 'react-tooltip';
 
 const Categories = () => {
   const [searchParams, setQueryParams] = useSearchParams();
@@ -37,12 +38,15 @@ const Categories = () => {
           return (
             <li key={index}>
               <button
+                data-tooltip-id='category-button-tooltip-id'
+                data-tooltip-content={category.name}
                 className={`text-sm hover:text-neutral-700 cursor-pointer whitespace-nowrap ${isSelected ? 'text-neutral-700 bg-neutral-200 rounded-full' : 'text-neutral-500'} py-2 px-4 hover:text-neutral-700 hover:bg-neutral-200 hover:rounded-full transition-all duration-200`}
                 type='button'
                 onClick={() => onCategoryClick(category.name)}
               >
-                {category.name}
+                <p className='max-w-[100px] truncate'>{category.name}</p>
               </button>
+              <Tooltip id='category-button-tooltip-id' />
             </li>
           );
         })}

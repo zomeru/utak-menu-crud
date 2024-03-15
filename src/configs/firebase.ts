@@ -19,5 +19,3 @@ const storage = getStorage(app);
 const realtimeDB = getDatabase(app);
 
 export { realtimeDB, storage };
-
-/** */

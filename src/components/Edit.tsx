@@ -14,6 +14,7 @@ import { createCategory, removeCategoryIfNoMenu, removeImage } from '@/services'
 import { realtimeDB } from '@/configs/firebase';
 import { toast } from 'react-toastify';
 import useUploadImage from '@/hooks/useImageUpload';
+import { Tooltip } from 'react-tooltip';
 
 const customModalStyles = {
   content: {
@@ -284,6 +285,8 @@ const Edit = () => {
                 />
               )}
               <button
+                data-tooltip-id='custom-category-tooltip'
+                data-tooltip-content={isCustomCategory ? 'Remove custom category' : 'Add custom category'}
                 type='button'
                 disabled={isSubmitting}
                 onClick={() => {
@@ -297,6 +300,7 @@ const Edit = () => {
                   <CiEdit className='w-5 h-5' />
                 )}
               </button>
+              <Tooltip id='custom-category-tooltip' />
             </div>
 
             <TextInput
